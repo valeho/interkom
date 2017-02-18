@@ -1,0 +1,842 @@
+<?php header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+//ob_start(); ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <!--<link href="/a2dsrc/media/css/n.css" media="all" rel="stylesheet" type="text/css">-->
+    <link href="<?php echo dir; ?>/css/n.css" media="all" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="<?php echo dir; ?>/bootstrap/css/bootstrap.min.css">
+    <link href="<?php echo dir; ?>/css/modal.css" rel="stylesheet" />
+    <META HTTP-EQUIV="Content-language" content ="ru">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="/opt/bootstrap/css/bootstrap-theme.min.css">
+
+    <script src="/ci/js/jquery-1.11.3.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="<?php echo dir; ?>/js/tbdata/media/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo dir; ?>/js/tbdata/examples/resources/syntax/shCore.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo dir; ?>/js/tbdata/examples/resources/demo.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo dir; ?>/css/modal.css">
+
+    <script type="text/javascript" language="javascript" src="<?php echo dir; ?>/js/tbdata/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" src="<?php echo dir; ?>/js/tbdata/examples/resources/syntax/shCore.js"></script>
+    <script type="text/javascript" language="javascript" class="init">
+
+        $(document).ready(function () {
+            var tb = $('#example').DataTable({
+                "language": {
+                    "url": "http://cdn.datatables.net/plug-ins/1.10.9/i18n/Russian.json"
+                },
+                scrollY: 600,
+                scrollCollapse: true,
+                "lengthChange": false,
+                "lengthMenu": false,
+                "pageLength": 'All',
+                "processing": true,
+                "serverSide": true,
+                "bFilter": false,
+                "autoWidth": true,
+                "paging": false,
+                "order": [],
+                "info": false,
+                "ajax": {
+                    "url": "http://opt.interkom.kz/<?php echo dir; ?>/tovar/ajax_search_cart",
+                },
+                "columns": [
+                    {"data": "code"},
+                    {"data": "article"},
+                    {"data": "title"},
+                    {"data": "mkei", className: "text-center"},
+                    {"data": "norm", className: "text-center"},
+                    {"data": "count", className: "text-center count"},
+                    {"data": "amount", className: "text-center"},
+                    {"data": "defData"}
+                ],
+            });
+        });
+    </script>
+    <script type="text/javascript">
+
+
+
+        function ClosePic() {
+            $(".popup2").hide();
+        }
+
+    </script>
+    <link href="/a2dsrc/media/css/style_new.css" media="all" rel="stylesheet" type="text/css">
+    <?php
+    if ($loginData['logged_in'] == FALSE) {
+        echo " <link href=\"".dir."/css/style_admin.css\" media=\"all\" rel=\"stylesheet\" type=\"text/css\">";
+    } ?>
+    <style>
+        #container {
+        width:400px; /*Ширина блока*/
+        height:250px; /*Высота блока*/
+        margin:0 auto;
+        overflow:visible;
+        position:absolute;
+        left:50%;
+        top:50%;
+        margin-left:-200px; /*Смещаем блок на половину всей ширины влево*/
+        margin-top:-100px; /*Смещаем блок на половину высоты вверх*/
+        background:#ffffff;
+        }
+        .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+            padding: 6px;
+            padding-left:10px;
+
+        }
+
+        .wrapper {
+            min-height:200px;
+        }
+        #menu_vv{
+            position: fixed;
+            z-index: 1000;
+            height: 51px;
+            width: 100%;
+            top: 0px;
+        }
+        .colls{
+            margin-top: -32px;
+            padding:10px;
+            padding-left:0px;
+            width:100%;
+
+
+        }
+        .colls td{
+            border-top: solid 1px #ddd;
+            /*padding:10px;*/
+            padding-left:0px;
+
+        }
+        .colls tr:nth-child(2n-1) {
+            background:#ededed;
+        }
+        #formAddToCart > table > tbody > tr > th {
+            background:#0072bb;
+            color:#fff;
+        }
+        ul li {
+            display:inline;
+            margin:0;
+            padding:0;
+            margin-right:4px;
+
+        }
+        #menu_vv2 > thead > tr > td > ul {
+            margin:0;
+            padding:0;
+            vertical-align:middle;
+            background:#fcfcfc;
+        }
+    </style>
+    <script>
+        var processing = true;
+        $(document).ready(function () {
+            $(window).scroll(function () {
+                //if (!processing)
+                //return;
+                console.log($(window).scrollTop(), $(document).height(), $(window).height());
+                if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+                    var dataSend = $('#searchForm').serialize();
+
+                    var count = $('.col_insert').length;
+                    if(count > 40) {
+                        console.log(count);
+                        $.ajax({
+                            type: 'POST',
+                            async: true,
+                            cache: false,
+                            url: '/opt/tovar/ajax_search',
+                            data: dataSend + '&start=' + count,
+                            dataType: "json",
+                            success: function (data) {
+                                if (data.status == 1) {
+                                    //processing = false;
+                                    $(data.html).insertAfter('.col_insert:last');
+                                }
+                            },
+                            error: function ()
+                            {
+                                $('#ajax_result').html('<div class="alert alert-danger">Ошибка выполнения запроса!</div>');
+                            }
+                        });
+                    }
+                }
+
+                var h_hght = 0;
+                var h_mrg = 0;
+                var top = $(this).scrollTop();
+                var elem = $('#menu_vv');
+                if ((top + h_mrg) < h_hght) {
+                    elem.css('top', (h_hght - top));
+                } else {
+                    elem.css('top', h_mrg);
+                    elem.css('width', '100%');
+                    elem.css('height', '60px');
+                }
+
+            });
+        });
+    </script>
+    <script>
+        function change(tag) {
+            tag.cssText = 'border-top:solid 1px #ccc';
+        }
+    </script>
+</head>
+<style>
+
+    .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+
+    }
+
+    #menu_vv2 > thead > tr > td > ul > li {
+        /*display:block;*/
+
+    }
+
+    #menu_vv2 > thead > tr > td > ul > li > label {
+        text-align:center;
+        width:150px;
+        padding-top:12px;
+        display:block;
+        float:left;
+        height:40px;
+        border: solid 1px #ccc;
+        border-bottom:0px;
+        margin:0px;
+        background:#fcfcfc;
+    }
+    .active {
+        border-top:solid 2px blue;
+    }
+
+    #menu_vv2 > thead > tr.blue_tr > td {
+        padding-top:15px;
+    }
+
+    #menu_vv > div.line_top > div > div > ul > li:nth-child(2) > div {
+        width:100%;
+        text-align:right;
+        position:absolute;
+        top:10px;
+    }
+    #menu_vv > div.line_top > div > div > ul {
+    }
+    #code, #art {
+        /* border-radius:5px; */
+        height:30px;
+        padding-left:10px;
+    }
+    #title {
+        /*border-bottom-left-radius: 2.5px;
+        border-top-left-radius: 2.5px;*/
+        height:21px;
+    }
+
+    .menu_site ul {
+        width: 300px;
+    }
+
+        .bread {
+            position:fixed;
+            top:48px;
+        }
+</style>
+<body>
+<?php
+print_r($loginData);
+if (!is_null($loginData['logged_in'])) {
+    ?>
+    <div class="wrapper">
+
+        <div id="menu_vv">
+            <div class="line_top">
+                <div class="menu-top-block">
+                    <div class="menu_site">
+                        <ul>
+                            <li>
+                                <a href="tovar" class="btn-menu">Главная</a>
+                            </li>
+
+                            <?php
+                            if ($loginData['logged_in'] == TRUE) {
+                                ?>
+                                <li>
+                                    <a href="<?php echo dir; ?>/magazine/index">Журнал заявок</a>
+                                </li>
+
+                            <?php } ?>
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="autoriz-wrapper">
+                    <div class="autoriz-block">
+                        <div class="autoriz-logo"></div>
+                        <div class="autoriz">
+
+
+
+                                <div><a><b><?php echo $loginData['compname']; ?></b>  <a href='#' onclick="logout();
+                                        return false;" class="link_logout">Выход</a></div>
+
+                                </php
+                                <div><a href="<?php echo dir; ?>/tovar/lk">Профиль</a> |  <?php
+                                    if($loginData['balance']>0) echo 'Ваша задолженность <span style="background:#ff4a38; font-weight:bold; padding:3px;">'.$loginData['balance'].' тг</span>';
+                                    if($loginData['balance']<0) echo 'Ваша переплата <span style="background:green">'.abs($loginData['balance']).' тг</span>';
+                                      ?></div>
+                                <script>
+                                    function logout() {
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '<?php echo dir; ?>/tovar/logout',
+                                            success: function (data) {
+                                                location.reload(true);
+                                            },
+                                            error: function (xhr, str) {
+                                                alert('Возникла ошибка: ' + xhr.responseCode);
+                                            }
+                                        });
+                                    }
+                                </script>
+
+
+
+
+                        </div>
+                        <div class="basket">
+                            <div class="pic_basket"><a href="<?php echo dir; ?>/tovar/cart"><img src="/a2dsrc/media/images/basket.png"/></a></div>
+                            <?php
+                            //print_r($this->session->userdata());
+                            echo '<div class="text_basket"><span id="summcart">'.@$this->session->userdata('summcart').'</span> Тг</div>';
+                            ?><a href="#" onclick="confrimCart()">Оформить заказ</a><br />
+
+                        </div>
+
+                    </div>
+                    </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="bread">
+            <a href="<?php echo dir; ?>/tovar"><span class="arr_b">Главная</span></a>
+            <span class="arr_b1">Для оптовых клиентов</span>
+            <div class="clr"></div>
+        </div>
+        <form id="searchForm">
+            <div>
+                <table class="table" style="background-color:white; position:fixed" id="menu_vv2">
+
+                    <thead style="background-color:white;">
+                    <tr style="background-color: #fcfcfc; padding:0px;">
+                        <td colspan="13" style="padding:0px;">
+                            <ul>
+                                <li><input type="radio" name="group" value="1" id="vaz" class="radio-inline"
+                                           style="color:#fff; display:none" checked onclick="search(this);"><label
+                                        for="vaz">LADA</label></li>
+                                <li><input type="radio" name="group" value="3" id="larg" class="radio-inline"
+                                           style="color:#fff; display:none;" onclick="search();"><label for="larg">LARGUS-RENAULT</label>
+                                </li>
+                                <li><input type="radio" name="group" value="4" id="hyn" class="radio-inline"
+                                           style="color:#fff; display:none;" onclick="search();"><label for="hyn">HYUNDAI-KIA</label>
+                                <li><input type="radio" name="group" value="5" id="dae" class="radio-inline"
+                                           style="color:#fff; display:none;" onclick="search();"><label
+                                        for="dae">DAEWOO</label>
+                                    <!--<li>/</li>-->
+
+                                <li></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0072bb; padding-top:15px; padding-bottom:10px; height:55px;"
+                        class="blue_tr">
+                        <td width="80" class="text-center" style="padding-top:10px"><span
+                                style="color:#fff; font-weight:bold; padding-top:15px;">Фото</span></td>
+                        <td width="70"><input type="text" name="code" id="code" placeholder="Код" style="width:100%;"
+                                              onkeyup="search();"></td>
+                        <td width="150"><input type="text" name="art" id="art" placeholder="Артикул" style="width:100%;"
+                                               onkeyup="search();"></td>
+                        <td>
+                            <table style="width:100%">
+                                <tr style="height:30px;">
+                                    <td><input type="text" name="title" id="title" placeholder="Наименование"
+                                               style="width:100%; border:0px; height:30px; padding-left:10px;"
+                                               onkeyup="search();"></td>
+                                    <td style="border:0px; width:190px; padding:0px; font-size:12px; height:23px; color:#ccc; background:#fff;">
+                                        &nbsp;поиск по ключевому слову <input type="checkbox" name="accur" value="1"
+                                                                              id="accur" class="checkbox-inline"
+                                                                              onclick="search();"></td>
+
+                                </tr>
+                            </table>
+
+
+                        </td>
+
+                        <td width="100" class="text-center"><span style="color:#fff; font-weight:bold;">Ед. изм.</span>
+                        </td>
+                        <td width="80" class="text-center"><span style="color:#fff; font-weight:bold;"><nobr>Норм. уп.</nobr></span>
+                        </td>
+                        <td width="42" class="text-center"><span style="color:#fff; font-weight:bold;">Ост.</span></td>
+                        <td width="55" class="text-center"><span style="color:#fff; font-weight:bold;">Цена</span></td>
+                        <td width="105" class="text-center"><span style="color:#fff; font-weight:bold;">Добавить в корзину</span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                            <td colspan="9" class="novinki"><input type="checkbox" name="is_new" value="1" id="is_new" class="radio-inline" style="display:inline" onclick="search();"><span>Показать только новинки</span></td>
+                    </tr>
+
+                    </thead>
+                </table>
+            </div>
+    </div>
+
+
+    <div class="content-main" style="width: 100%;">
+        <div class="main-block" style="width: 100%;">
+            <div class="text-block-main" style="margin-top: 10px;">
+                <div>
+                    <div style="">
+                        <div id="ajax_result"></div>
+
+
+                        <table class="colls">
+                            <tr class="col_insert_new">
+                                <th width="80" class="text-center">Фото</th>
+                                <th width="65">Код</th>
+                                <th width="140">Артикул</th>
+                                <th>Наименование</th>
+
+                                <th width="100" class="text-center">Ед. изм.</th>
+                                <th width="80" class="text-center">Норм. уп.</th>
+                                <th width="42" class="text-center">Ост.</th>
+                                <th width="55" class="text-center">Цена</th>
+                                <th width="105" class="text-center"><span style="color:#fff; font-weight:bold;">Добавить в корзину</span>
+                                </th>
+                            </tr>
+                            <?php
+                            if (!empty($arr)) {
+                                foreach ($arr as $item) {
+                                        if($item['incart']==1) $sty = "style='background-color:yellow;'";
+                                        if($item['inwork']==1) $sty2 = "style='background-color:yellow;'";
+                                    ?>
+
+                                    <tr class="col_insert" <?php echo @$sty; @sty2 ?>>
+                                        <?php $sty=''; $sty2 = ''; ?>
+                                        <td width="80" class="text-center"><?php if ($item['pic'] == 1) {
+                                            ?><a href="#" class="imageshow" image="<?php echo $item['id']; ?>"
+                                                 data-toggle="modal" data-target="#showimage3"><img
+                                                    src="/ci/img/dummy-articol.png"></a>
+
+                                        </td> <?php } else echo "</td>"; ?>
+                                        <td width="65" class="text-center"><?php echo trim($item['code']); ?></td>
+                                        <td width="140"
+                                            class="text-center"><?php echo mb_substr($item['article'], 0, 15, 'UTF8'); ?></td>
+                                        <td width="auto"
+                                            style="padding-left:22px;"><?php echo mb_substr($item['title'], 0, 150, 'UTF8'); ?></td>
+                                        <td width="100" class="text-center"><?php echo $item['mkei']; ?></td>
+                                        <td width="80" class="text-center"><?php
+
+
+                                            echo $item['norm']; ?></td>
+                                        <td width="42" class="text-center"><?php
+                                            $pic = "plus.png";
+
+                                            if ($item['is'] == ' ') {
+                                                $pic = "car.png";
+                                            }
+                                            if ($item['is'] == '-') {
+                                                $pic = "-.png";
+                                            }
+                                            echo "<img src=\"/a2dsrc/media/images/" . $pic . "\">"; ?></td>
+
+                                        <td width="55" class="text-center"><?php echo $item['price']; ?></td>
+                                        <td width="105" class="text-center"><?php echo $item['defData'];
+                                           echo $sty;
+                                            ?></td>
+                                    </tr>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </table>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="autorizModal" tabindex="-1" role="dialog" aria-labelledby="autorizModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Авторизация</h4>
+                </div>
+                <div class="modal-body">
+                    
+                    <form id="formLogin">
+                        <div class="form-group">
+                            <label for="inputLogin">Логин</label>
+                            <input type="text" class="form-control" id="inputLogin" name="login" placeholder="Логин">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPass">Пароль</label>
+                            <input type="password" class="form-control" id="inputPass" name="passwd"
+                                   placeholder="Пароль">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                    <button id="btnSend" type="button" onclick="send_form();" class="btn btn-default"
+                            data-loading-text="Loading...">Вход
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addToCart" tabindex="-1" role="dialog" aria-labelledby="addToCartLabel">
+        <div class="modal-dialog modal-lg" role="document" style="width:90%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Добавление товара в корзину</h4>
+                </div>
+                <div class="modal-addToCart">
+
+                </div>
+                <div class="modal-footer">
+                    <button id="btnAddToCart" type="button" onclick="addToCart();" class="btn btn-primary btn-sm"
+                            data-loading-text="Loading..."><i class="glyphicon glyphicon-shopping-cart"></i> В корзину
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="showimage3" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document" style="width:550px;">
+            <div class="modal-content">
+                <div>
+                    <a class="btn close_but" data-dismiss="modal"></a>
+                </div>
+                <div class="modal-body">
+
+                    <img name="newImage" src="" class="modalpic" width="500px" alt=""/>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="shownews" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document" style="width:550px;">
+            <div class="modal-content">
+                <div class="title_new"></div>
+                <div class="text_new"></div>
+
+                <div class="modal-body">
+                    
+                </div>
+                <div class="modal-footer">
+                     <button type="button" id="close_new" new="" class="btn btn-default btn-sm" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php
+} else {
+    ?>
+       <?php $this->load->view('tovar/login'); ?>
+
+<?php
+}
+?>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function (d, w, c) {
+        (w[c] = w[c] || []).push(function() {
+            try {
+                w.yaCounter38205820 = new Ya.Metrika({
+                    id:38205820,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true,
+                    webvisor:true,
+                    ut:"noindex"
+                });
+            } catch(e) { }
+        });
+
+        var n = d.getElementsByTagName("script")[0],
+            s = d.createElement("script"),
+            f = function () { n.parentNode.insertBefore(s, n); };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+            d.addEventListener("DOMContentLoaded", f, false);
+        } else { f(); }
+    })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/38205820?ut=noindex" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+<script>
+
+    $(document).on('click', '.new_image', function(e) {
+        $(this).addClass('currentPic');
+            $('.mainPic').attr({"src" : $(this).attr('src')});
+
+    }
+    );
+    $(document).on('click', '.imageshow', function () {
+            var attrurl = $(this).attr('image');
+            var url = 'http://opt.interkom.kz<?php echo dir; ?>/tovar/allimage/' + attrurl;
+
+            $('.modal-body').load(url);
+
+            //($('.imageshow').attr('image'));
+        }
+    )
+
+
+    $(document).on('click', '.btn_sel', function () {
+        $(this).parent().parent().attr('style', 'background-color:yellow');
+
+        $('.modal-addToCart').load('<?php echo dir; ?>/tovar/showFormCart', {
+            code: $(this).data('code'),
+            article: $(this).data('article'),
+            mkei: $(this).data('mkei'),
+            norm: $(this).data('norm'),
+            idTovar: $(this).data('id'),
+            tovarName: $(this).data('title'),
+            priceTovar: $(this).data('price'),
+            is: $(this).data('is')
+        }, function (result) {
+            $('#addToCart').modal({show: true});
+            $('#addToCart').on('shown.bs.modal', function () {
+                $("#inp_cart", this).focus();
+                console.log('11', $("#inp_cart").val());
+            })
+        });
+    });
+    function showPic(imageGUID) {
+        document.newImage.src = "http://opt.interkom.kz<?php echo dir; ?>/tovar/image/" + imageGUID;
+        $('#showimage3').modal({show: true});
+
+        /*$(".popup2").show();
+
+         $(".popup2").css("left",doc_w/2-250)
+         $(".popup2").css("top", 100)*/
+    }
+    function send_form() {
+        var $btn = $('#btnSend').button('Проверка...');
+
+        var dataSend = $('#loginform').serialize();
+       // alert(dataSend);
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo dir; ?>/tovar/login',
+            data: dataSend,
+            dataType: "json",
+            success: function (data) {
+
+                if (data.status == 1) {
+                    $('#ajax_result').html('<div class="alert alert-success">' + data.message + '</div>');
+                    location.reload(true);
+                } else {
+                    $('#ajax_result').html('<div class="alert alert-danger">' + data.message + '</div>');
+                }
+                $btn.button('reset')
+            },
+            error: function () {
+
+                $('#ajax_result').html('<div class="alert alert-danger">Ошибка выполнения запроса!</div>');
+                $btn.button('reset')
+            }
+        });
+    }
+
+    function addToCart() {
+        var $btn = $('#btnAddToCart').button('Проверка...');
+        var dataSend = $('#formAddToCart').serialize();
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo dir; ?>/tovar/addToCart',
+            data: dataSend,
+            dataType: "json",
+            success: function (data) {
+                
+				if (data.status == 1) {
+                    $('#ajax_result_cart').html('<div class="alert alert-success">' + data.message + '</div>');
+                    $('#addToCart').modal('hide');
+					    //$('#summcart').html(data.summcart);
+					console.log(dataSend);
+					console.log('ТУТ');
+                } else {
+                    $('#ajax_result_cart').html('<div class="alert alert-danger">' + data.message + '</div>');
+                    $btn.button('reset');
+                }
+            },
+            error: function () {
+                $('#ajax_result_cart').html('<div class="alert alert-danger">Ошибка выполнения запроса!</div>');
+                $btn.button('reset');
+
+            }
+
+        });
+		
+        $('#addToCart').modal('hide');
+    }
+
+    function logout() {
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo dir; ?>/tovar/logout',
+            success: function (data) {
+                location.reload(true);
+            },
+            error: function () {
+                $('#ajax_result').html('<div class="alert alert-danger">Ошибка выполнения запроса!</div>');
+            }
+        });
+    }
+
+
+    function dump(obj, obj_name) {
+        var result = ""
+        for (var i in obj)
+            result += obj_name + "." + i + " = " + obj[i] + "\n";
+        return result
+    }
+
+    $(document).on('click', '#close_new', function() {
+
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo dir; ?>/tovar/updatenew/' + $(this).attr('url'),
+            data: "id=" + $(this).attr('url'),
+            success: function (data) {
+                console.log(data);
+            }
+        });
+    });
+
+    function CheckBalance() {
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo dir; ?>/tovar/echoshowSumm/<?php echo $loginData['binaryData']; ?>',
+            success: function (data) {
+                $('#summcart').html(data);
+            }
+        })
+    }
+    setInterval(CheckBalance,1000);
+
+    function check_new() {
+        $.ajax({
+            type:'POST',
+            url: '<?php echo dir; ?>/tovar/check_news',
+            success: function (data) {
+
+                var newdata = JSON.parse(data, function (k,v) {
+                    return v;
+                });
+
+                if(newdata[0]._id != '') {
+                    $('#shownews').modal({show: true});
+                    $('.title_new').html(newdata[0]._title);
+                    $('.text_new').html(newdata[0]._text);
+                    $('#close_new').attr('url', newdata[0]._id);
+                }
+            }
+        });
+    }
+    setInterval(check_new, 60000);
+
+    function confrimCart() {
+
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo dir; ?>/tovar/confirmCart',
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 1) {
+                    location.reload(true);
+                    $('#summcart').html('0');
+                } else {
+                   // $('#ajax_result').html('<div class="alert alert-danger">' + data.message + '</div>');
+                    location.reload(true);
+                    $('#summcart').html('0');
+                }
+            },
+            error: function ()
+            {
+                //$('#ajax_result').html('<div class="alert alert-danger">Ошибка выполнения запроса!</div>');
+                location.reload(true);
+                $('#summcart').html('0');
+            }
+        });}
+    function search(e) {
+        var dataSend = $('#searchForm').serialize();
+        // var e = $(this).prev().attr("id");
+        //alert(dump($(this), $(this).id));
+        var f = $('input:radio:checked');
+        $('input:radio').each(function (i, elem) {
+                //   alert($(this).attr("id"));
+                $(this).next().css("border-top", "1px #ccc");
+                $(e).next().css("height", "26px;");
+                $(this).next().css("background-color", "#fcfcfc");
+                $(this).next().css("padding-top", "12px");
+            }
+        )
+        //  alert($(e).next().attr("id"));
+
+        $(f).next().css("border-top", "3px solid #0072bb");
+        $(f).next().css("background", "#ffffff");
+        $(f).next().css("padding-top", "10px");
+        $(e).next().css("height", "26px;");
+        //e.style.background  = '#000';
+        //$(this).getElem
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo dir; ?>/tovar/ajax_search',
+            data: dataSend,
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 1) {
+                    $('.col_insert').remove();
+                    $(data.html).insertAfter('.col_insert_new:last');
+                } else {
+                    $('.col_insert').remove();
+                    //$('#ajax_result').html('<div class="alert alert-danger">' + data.message + '</div>');
+                }
+            },
+            error: function () {
+                $('#ajax_result').html('<div class="alert alert-danger">Ошибка выполнения запроса!</div>');
+            }
+        });
+    }
+
+</script>
+<script src="/ci/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
