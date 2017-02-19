@@ -252,6 +252,107 @@ EOL;
         }
     }
 
+
+    public function getNews() {
+        $query = $this->db->query("exec dbo.sp_tab_news");
+        if ($query->num_rows() > 0) {
+           foreach ($query->result() as $row) {
+               $arr[] =
+                   array(
+                       'title' => $row->_Fld13685,
+                       'date'   => $row->_Date_Time,
+                       'news'   => $row->_Fld13686,
+                       'guid'   => $row->_guid
+                   );
+               //$row->_guid;
+             /*  $arr['title'][] = $row->_Fld13685;
+               $arr['news'][] = $row->_Fld13686;
+               $arr['text'][] = $row->_Date_Time;*/
+           }
+        }
+
+       //$this->ajax_search_nov($arr['guid'][0]);
+        $html = '<table>'.$this->load->view('tovar/tov_news', array('arr' => $arr), true).'</table>';
+        echo json_encode($html);
+    }
+#-------------------Функция отображения списка товаров в новостях
+    public function ajax_search_nov($guid)
+    {
+        $word = "''";
+        $numb = "''";
+        $art = "''";
+        $folder = 1;
+        $start1 = 1;
+
+
+
+        $query = $this->db->query("exec dbo.sp_tab_goods_nov $start1, $word, $numb, $art, $this->_skidCode, $folder, 0, 100, 0, \"$guid\"");
+        $arr = array();
+        $id = array();
+       // print_r($query);
+        if ($query->num_rows() > 0)
+        {
+            $numb_n = $query->result()[0]->_top_n;
+            $numb_fn = $query->result()[0]->_top_n;
+            foreach ($query->result() as $row)
+            {
+                $st = 0;  $st1 = 0;
+                if ($row->_inwork)
+                {
+                    $st = 1;
+                }
+                if ($row->_incart)
+                {
+                    $st = 1;
+                }
+                if ($row->_is == 0)
+                {
+                    $way = '-';
+                }
+                if ($row->_is == 1)
+                {
+                    $way = '+';
+                }
+                if ($row->_is == 2)
+                {
+                    $way = '~';
+                }
+                $arr[] = array(
+                    'incart' => $st,
+                    'inwork' => $st1,
+                    'id' => $row->_id,
+                    'title' => $row->_descr,
+                    'price' => number_format($row->_price, 0, '', ''),
+                    'article' => $row->_art,
+                    'code' => $row->_code,
+                    'mkei' => $row->_ed,
+                    'norm' => $row->_pack,
+                    'new' => $row->_new,
+                    'pic' => $row->_pic,
+                    'is' => $way,
+                    'defData' => ($this->_is_login) ? '<button class="btn_sel cart_btn_plus" type="button" '
+                        . 'data-code="' . $row->_code . '" '
+                        . 'data-article="' . $row->_art . '" '
+                        . 'data-mkei="' . $row->_ed . '"'
+                        . 'data-norm="' . $row->_pack . '"'
+                        . 'data-id="' . $row->_id . '"'
+                        . 'data-title="' . htmlspecialchars($row->_descr) . '"'
+                        . 'data-price="' . number_format($row->_price, 0, '', '') . '"'
+                        . 'data-is="' . $way . '"'
+                        . '> </button>' : '&nbsp;'
+                );
+            }
+
+            $html = '<table>'.$this->load->view('tovar/tov', array('arr' => $arr), true).'</table>';
+
+            echo json_encode(array('status' => 1, 'html' => $html, 'count' => $start1));
+        }
+        else
+        {
+            echo json_encode(array('status' => 2));
+        }
+    }
+
     public function lk () {
        @$client = $this->session->userdata['dataLogin']['adress']->_uid;
       //  print_r($client);

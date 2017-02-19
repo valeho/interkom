@@ -271,9 +271,15 @@ if (!is_null($loginData['logged_in'])) {
                                 </li>
 
                             <?php } ?>
+                            <li>
+                                <a href="#" class="btn_news">Новости</a>
+                            </li>
 
                         </ul>
                     </div>
+                </div>
+                <div id="News2">
+
                 </div>
                 <div class="autoriz-wrapper">
                     <div class="autoriz-block">
@@ -477,7 +483,22 @@ if (!is_null($loginData['logged_in'])) {
     </div>
 
 
-
+<div class="modal fade" id="News" tabindex="-1" role="dialog" aria-labelledby="autorizModalLabel">
+    <div class="modal-dialog" role="document" style="width:100%; margin:auto 0px;">
+        <div class="modal-content" style="width:1200px">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Новости</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- Modal -->
     <div class="modal fade" id="autorizModal" tabindex="-1" role="dialog" aria-labelledby="autorizModalLabel">
         <div class="modal-dialog" role="document">
@@ -513,7 +534,7 @@ if (!is_null($loginData['logged_in'])) {
 
     <div class="modal fade" id="addToCart" tabindex="-1" role="dialog" aria-labelledby="addToCartLabel">
         <div class="modal-dialog modal-lg" role="document" style="width:90%;">
-            <div class="modal-content">
+            <div class="modal-content" style="width:100%">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
@@ -531,13 +552,13 @@ if (!is_null($loginData['logged_in'])) {
             </div>
         </div>
     </div>
-    <div class="modal fade" id="showimage3" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document" style="width:550px;">
+    <div class="modal fade" id="showimage3" tabindex="-1" role="dialog" style="width:100%;">
+        <div class="modal-dialog modal-lg" role="document" style="width:80%;">
             <div class="modal-content">
                 <div>
                     <a class="btn close_but" data-dismiss="modal"></a>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" width="80%">
 
                     <img name="newImage" src="" class="modalpic" width="500px" alt=""/>
                 </div>
@@ -609,7 +630,7 @@ if (!is_null($loginData['logged_in'])) {
     );
     $(document).on('click', '.imageshow', function () {
             var attrurl = $(this).attr('image');
-            var url = 'http://opt.interkom.kz<?php echo dir; ?>/tovar/allimage/' + attrurl;
+            var url = '<?php echo dir; ?>/tovar/allimage/' + attrurl;
 
             $('.modal-body').load(url);
 
@@ -634,10 +655,22 @@ if (!is_null($loginData['logged_in'])) {
             $('#addToCart').modal({show: true});
             $('#addToCart').on('shown.bs.modal', function () {
                 $("#inp_cart", this).focus();
-                console.log('11', $("#inp_cart").val());
+                //console.log('11', $("#inp_cart").val());
             })
         });
     });
+
+    $(document).on('click', '.btn_news', function () {
+        //alert('here');
+        $('#News').modal({show: true});
+        $.getJSON('<?php echo dir; ?>/tovar/getNews',
+            function (data) {
+                //alert(data);
+                $('.modal-body').html(data);
+            }
+        )
+        });
+
     function showPic(imageGUID) {
         document.newImage.src = "http://opt.interkom.kz<?php echo dir; ?>/tovar/image/" + imageGUID;
         $('#showimage3').modal({show: true});
@@ -796,6 +829,14 @@ if (!is_null($loginData['logged_in'])) {
                 $('#summcart').html('0');
             }
         });}
+
+    function ShowNews() {
+        $('.modal-News').load('/opt/tovar/getNews');
+
+    }
+    $(document).on('click', '#News', function() {
+        $("News").fadeOut();
+    });
     function search(e) {
         var dataSend = $('#searchForm').serialize();
         // var e = $(this).prev().attr("id");
@@ -836,7 +877,14 @@ if (!is_null($loginData['logged_in'])) {
             }
         });
     }
-
+    function ShowNew(guid2) {
+        console.log('/opt/tovar/ajax_search_nov/' + guid2);
+        $.getJSON('/opt/tovar/ajax_search_nov/' + guid2,
+                 function (data) {
+                    $('#news_table').html(data.html);
+                 }
+        );
+    }
 </script>
 <script src="/ci/bootstrap/js/bootstrap.min.js"></script>
 </body>

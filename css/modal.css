@@ -69,3 +69,33 @@
     transform: rotate(360deg);
 }
 /* изображения внутри окна */
+
+#News2 {
+    width:80%;
+    display: none;
+    position: absolute;
+    top:40px;
+    height:80%;
+    min-height:400px;
+
+    background: #fff;
+}
+
+#news_table {
+    float:right;
+}
+
+#NewsTable_wrapper {
+
+}
+#NewsMenu {
+    width:100px;
+    position:relative;
+    display: block;
+    margin:0;
+    padding:0px;
+}
+
+.news_title {
+    width:200px;
+}
