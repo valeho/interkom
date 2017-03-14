@@ -15,6 +15,9 @@
                         </li>
 
                     <?php } ?>
+                    <li>
+                        <a href="#" class="btn_news" data-toggle="modal" data-target="#News">Новости<span class="count"><sup><?php echo $count; ?></sup></span></a>
+                    </li>
                     <!--   <li>
                         <a href="<?php //echo '/a2dsrc/contact/index'
                     ?>">Контакты</a>

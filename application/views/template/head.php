@@ -10,7 +10,10 @@
         <!-- Optional theme -->
         <link rel="stylesheet" href="/ci/bootstrap/css/bootstrap-theme.min.css">
 
-        <script src="/ci/js/jquery-1.11.3.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="<?php echo dir; ?>/js/tbdata/media/css/jquery.dataTables.css">
+        <link rel="stylesheet" type="text/css" href="<?php echo dir; ?>/js/tbdata/examples/resources/syntax/shCore.css">
+        <link rel="stylesheet" type="text/css" href="<?php echo dir; ?>/js/tbdata/examples/resources/demo.css">
+        <link rel="stylesheet" type="text/css" href="<?php echo dir; ?>/css/modal.css">
 
         <script src="/ci/js/jquery-1.11.3.min.js"></script>
         <style>
@@ -107,8 +110,15 @@
 
     <body>
     <?php if ($loginData['logged_in'] == FALSE) {
+    ?>
+    <script>
+        logout()
+        function logout() {
 
-    redirect(dir.'/tovar');
-
+                    location = '<?php echo dir; ?>/tovar/';
+               
+        }
+    </script>
+    <?php
 }
 ?>

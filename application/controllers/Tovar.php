@@ -71,6 +71,7 @@ EOL;
         $start = 1;
 //		echo "exec dbo.sp_tab_goods $start, $word, $numb, $art, $this->_skidCode, $folder, 0, 100, 0";
         $query = $master->query("exec dbo.sp_tab_goods $start, $word, $numb, $art, $this->_skidCode, $folder, 0, 100, 0");
+        $count = $this->getCountNews();
         $arr = array();
         $id = array();
         if ($query->num_rows() > 0)
@@ -126,7 +127,7 @@ EOL;
             }
         }
 
-        $this->load->view('tovar/tovar', array('loginData' => $skidki, 'arr' => $arr));
+        $this->load->view('tovar/tovar', array('loginData' => $skidki, 'arr' => $arr, 'count' => $count));
     }
 
 	public function LoginForm() {
@@ -165,7 +166,7 @@ EOL;
     }
     public function ajax_search()
     {
-        $word = "'" . $this->input->post('title', TRUE) . "'";
+        $word = "'%" . $this->input->post('title', TRUE) . "%'";
         $numb = "'" . $this->input->post('code', TRUE) . "'";
         $art = "'" . $this->input->post('art', TRUE) . "'";
         $folder = ($this->input->post('group', TRUE)) ? $this->input->post('group', TRUE) : 1;
@@ -241,10 +242,11 @@ EOL;
                             . '> </button>' : '&nbsp;'
                 );
             }
-
+           $sql = 'exec dbo.sp_tab_goods '. $start1 .', %'.$word .'%, '.$numb.', '.$art.', '.$this->_skidCode.', '.$folder.', '.$new.', 50, '.$accur;
+           // echo $sql;
             $html = $this->load->view('tovar/tov', array('arr' => $arr), true);
 
-            echo json_encode(array('status' => 1, 'html' => $html, 'count' => $start1));
+            echo json_encode(array('status' => 1, 'html' => $html, 'count' => $start1, "sql" => $sql));
         }
         else
         {
@@ -255,8 +257,11 @@ EOL;
 
     public function getNews() {
         $query = $this->db->query("exec dbo.sp_tab_news");
+        $cc = 0;
         if ($query->num_rows() > 0) {
            foreach ($query->result() as $row) {
+               $cc++;
+               if($cc < 4) {
                $arr[] =
                    array(
                        'title' => $row->_Fld13685,
@@ -264,6 +269,7 @@ EOL;
                        'news'   => $row->_Fld13686,
                        'guid'   => $row->_guid
                    );
+               }
                //$row->_guid;
              /*  $arr['title'][] = $row->_Fld13685;
                $arr['news'][] = $row->_Fld13686;
@@ -273,6 +279,53 @@ EOL;
 
        //$this->ajax_search_nov($arr['guid'][0]);
         $html = '<table>'.$this->load->view('tovar/tov_news', array('arr' => $arr), true).'</table>';
+        echo json_encode($html);
+    }
+
+    public function getNewsAll() {
+        $query = $this->db->query("exec dbo.sp_tab_news");
+        $cc = 0;
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $row) {
+
+                    $arr[] =
+                        array(
+                            'title' => $row->_Fld13685,
+                            'date'   => $row->_Date_Time,
+                            'news'   => $row->_Fld13686,
+                            'guid'   => $row->_guid
+                        );
+                //$row->_guid;
+                /*  $arr['title'][] = $row->_Fld13685;
+                  $arr['news'][] = $row->_Fld13686;
+                  $arr['text'][] = $row->_Date_Time;*/
+            }
+        }
+
+        //$this->ajax_search_nov($arr['guid'][0]);
+        $html = '<table>'.$this->load->view('tovar/tov_news', array('arr' => $arr), true).'</table>';
+        echo json_encode($html);
+    }
+
+    public function getOneNew($guid) {
+        $query = $this->db->query("exec dbo.sp_tab_news \"$guid\"");
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $row) {
+                $arr =
+                    array(
+                        'title' => $row->_Fld13685,
+                        'date'   => $row->_Date_Time,
+                        'news'   => $row->_Fld13686
+                       // 'guid'   => $row->_guid
+                    );
+                //$row->_guid;
+                /*  $arr['title'][] = $row->_Fld13685;
+                  $arr['news'][] = $row->_Fld13686;
+                  $arr['text'][] = $row->_Date_Time;*/
+            }
+        }
+        $arr['tovar'] = $this->ajax_search_nov($guid);
+        $html = '<table>'.$this->load->view('tovar/tov_one_new', array('arr' => $arr), true).'</table>';
         echo json_encode($html);
     }
 #-------------------Функция отображения списка товаров в новостях
@@ -296,6 +349,8 @@ EOL;
             $numb_fn = $query->result()[0]->_top_n;
             foreach ($query->result() as $row)
             {
+
+
                 $st = 0;  $st1 = 0;
                 if ($row->_inwork)
                 {
@@ -330,7 +385,7 @@ EOL;
                     'new' => $row->_new,
                     'pic' => $row->_pic,
                     'is' => $way,
-                    'defData' => ($this->_is_login) ? '<button class="btn_sel cart_btn_plus" type="button" '
+                    'defData' => ($this->_is_login) ? '<button class="btn_sel cart_btn_plus_news" type="button" '
                         . 'data-code="' . $row->_code . '" '
                         . 'data-article="' . $row->_art . '" '
                         . 'data-mkei="' . $row->_ed . '"'
@@ -343,13 +398,12 @@ EOL;
                 );
             }
 
-            $html = '<table>'.$this->load->view('tovar/tov', array('arr' => $arr), true).'</table>';
+            return $arr;
 
-            echo json_encode(array('status' => 1, 'html' => $html, 'count' => $start1));
         }
         else
         {
-            echo json_encode(array('status' => 2));
+            return $arr;
         }
     }
 
@@ -537,6 +591,16 @@ EOL;
             echo json_encode(array('status' => 2, 'message' => 'Ошибка выполнения запроса'));
         }
     }
+    public function getCountNews() {
+        $master = $this->load->database('master', TRUE, TRUE);
+        $sql = <<<EOL
+                exec dbo.NewsCount $this->_skidCode
+EOL;
+        $result = $master->query($sql);
+        $res = $result->result();
+        //print_r($res);
+        return $res[0]->CountView;
+    }
 
     public function cart()
     {
@@ -547,7 +611,7 @@ EOL;
         $sql = <<<EOL
                 exec dbo.sp_tab_cart $guid
 EOL;
-		echo $sql;
+		//echo $sql;
 		
         $result = $master->query($sql);
         if ($result->num_rows() > 0)
@@ -558,6 +622,7 @@ EOL;
                 $summ[] = $items->_amount;
             }
             $data['sum'] = array_sum($summ);
+            $data['count'] = $this->getCountNews();
             $this->load->view('tovar/cart', $data);
         }
         else
@@ -893,13 +958,15 @@ EOL;
 	$files = glob("E:/site/_fstore/_pics/".$ar."*.j*"); // Получаем все html-файлы из директории
 	//print_r($files);
 
-	echo "<img class=\"mainPic\" width=\"500px\" src=\"http://opt.interkom.kz/img/_fstore/_pics/".basename($files[0])."\" />";
+	echo "<img class=\"mainPic\" width=\"500px\" src=\"http://opt.interkom.kz/img/_fstore/_pics/".basena1me($files[0])."\" />";
 
     foreach($files as $image) {
 
         echo '<img class="new_image" src="http://opt.interkom.kz/img/_fstore/_pics/'.basename($image).'" width="200px">';
 	}
 	}
+
+
     public function image_new ($image) {
         ob_flush();
         header('Content-Type:image/jpeg');

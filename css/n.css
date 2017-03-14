@@ -739,6 +739,7 @@ a{
 .autoriz-wrapper {
     float:right;
     color:#fff;
+    width:630px;
     position:relative;
 }
 .autoriz-wrapper a {
@@ -828,7 +829,7 @@ ul li {
 
 .menu-top-block {
     left:0px;
-    width:50%;
+    width:350px;
     float:left;
 }
 .autoriz-block {

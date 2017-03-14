@@ -13,7 +13,7 @@
         <link rel="stylesheet" type="text/css" href="/opt/js/tbdata/media/css/jquery.dataTables.css">
         <link rel="stylesheet" type="text/css" href="/ci/js/tbdata/examples/resources/syntax/shCore.css">
         <link rel="stylesheet" type="text/css" href="/ci/js/tbdata/examples/resources/demo.css">
-
+        <link rel="stylesheet" type="text/css" href="<?php echo dir; ?>/css/modal.css">
         <script type="text/javascript" language="javascript" src="/ci/js/tbdata/media/js/jquery.dataTables.js"></script>
         <script type="text/javascript" language="javascript" src="/ci/js/tbdata/examples/resources/syntax/shCore.js"></script>
         <script type="text/javascript" language="javascript" class="init">
@@ -154,6 +154,7 @@
                 </div>
             </div>
         </div>
+        <?php $this->load->view('template/bottom_news'); ?>
         
             <!-- Yandex.Metrika counter -->
             <script type="text/javascript">

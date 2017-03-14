@@ -6,7 +6,6 @@
     <!--<link href="/a2dsrc/media/css/n.css" media="all" rel="stylesheet" type="text/css">-->
     <link href="<?php echo dir; ?>/css/n.css" media="all" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="<?php echo dir; ?>/bootstrap/css/bootstrap.min.css">
-    <link href="<?php echo dir; ?>/css/modal.css" rel="stylesheet" />
     <META HTTP-EQUIV="Content-language" content ="ru">
     <!-- Optional theme -->
     <link rel="stylesheet" href="/opt/bootstrap/css/bootstrap-theme.min.css">
@@ -99,7 +98,7 @@
             top: 0px;
         }
         .colls{
-            margin-top: -32px;
+            margin-top: -64px;
             padding:10px;
             padding-left:0px;
             width:100%;
@@ -224,6 +223,7 @@
         text-align:right;
         position:absolute;
         top:10px;
+        margin-left:10px;
     }
     #menu_vv > div.line_top > div > div > ul {
     }
@@ -240,6 +240,7 @@
 
     .menu_site ul {
         width: 300px;
+        margin-left:12px;
     }
 
         .bread {
@@ -260,7 +261,7 @@ if (!is_null($loginData['logged_in'])) {
                     <div class="menu_site">
                         <ul>
                             <li>
-                                <a href="tovar" class="btn-menu">Главная</a>
+                                <a href="/opt/tovar" class="btn-menu">Главная</a>
                             </li>
 
                             <?php
@@ -272,7 +273,7 @@ if (!is_null($loginData['logged_in'])) {
 
                             <?php } ?>
                             <li>
-                                <a href="#" class="btn_news">Новости</a>
+                                <a href="#" class="btn_news" data-toggle="modal" data-target="#News">Новости<span class="count"><sup style="left: -1px"><?php echo $count; ?></sup></span></a>
                             </li>
 
                         </ul>
@@ -483,22 +484,9 @@ if (!is_null($loginData['logged_in'])) {
     </div>
 
 
-<div class="modal fade" id="News" tabindex="-1" role="dialog" aria-labelledby="autorizModalLabel">
-    <div class="modal-dialog" role="document" style="width:100%; margin:auto 0px;">
-        <div class="modal-content" style="width:1200px">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Новости</h4>
-            </div>
-            <div class="modal-body">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-            </div>
-        </div>
-    </div>
-</div>
+    <?php $this->load->view('template/bottom_news'); ?>
+
+
     <!-- Modal -->
     <div class="modal fade" id="autorizModal" tabindex="-1" role="dialog" aria-labelledby="autorizModalLabel">
         <div class="modal-dialog" role="document">
@@ -552,35 +540,7 @@ if (!is_null($loginData['logged_in'])) {
             </div>
         </div>
     </div>
-    <div class="modal fade" id="showimage3" tabindex="-1" role="dialog" style="width:100%;">
-        <div class="modal-dialog modal-lg" role="document" style="width:80%;">
-            <div class="modal-content">
-                <div>
-                    <a class="btn close_but" data-dismiss="modal"></a>
-                </div>
-                <div class="modal-body" width="80%">
 
-                    <img name="newImage" src="" class="modalpic" width="500px" alt=""/>
-                </div>
-
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="shownews" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document" style="width:550px;">
-            <div class="modal-content">
-                <div class="title_new"></div>
-                <div class="text_new"></div>
-
-                <div class="modal-body">
-                    
-                </div>
-                <div class="modal-footer">
-                     <button type="button" id="close_new" new="" class="btn btn-default btn-sm" data-dismiss="modal">Закрыть</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <?php
 } else {
@@ -660,9 +620,10 @@ if (!is_null($loginData['logged_in'])) {
         });
     });
 
+
     $(document).on('click', '.btn_news', function () {
         //alert('here');
-        $('#News').modal({show: true});
+       // $('#News').modal({show: true});
         $.getJSON('<?php echo dir; ?>/tovar/getNews',
             function (data) {
                 //alert(data);
@@ -670,6 +631,30 @@ if (!is_null($loginData['logged_in'])) {
             }
         )
         });
+
+    $(document).on('click', '.btn_news_all', function () {
+        //alert('here');
+        // $('#News').modal({show: true});
+        $.getJSON('<?php echo dir; ?>/tovar/getNewsAll',
+            function (data) {
+                //alert(data);
+                $('.modal-body').html(data);
+            }
+        )
+    });
+
+    $(document).on('click', '.button', function () {
+        //alert('here');
+        //$('#oneNews').modal({show: true});
+        var guid = $(this).attr('guid');
+       // console.log('<?php echo dir; ?>/tovar/getOneNew/' + guid)
+        $.getJSON('<?php echo dir; ?>/tovar/getOneNew/' + guid,
+            function (data) {
+                //alert(data);
+                $('.modal-body').html(data);
+            }
+        )
+    });
 
     function showPic(imageGUID) {
         document.newImage.src = "http://opt.interkom.kz<?php echo dir; ?>/tovar/image/" + imageGUID;
@@ -831,7 +816,7 @@ if (!is_null($loginData['logged_in'])) {
         });}
 
     function ShowNews() {
-        $('.modal-News').load('/opt/tovar/getNews');
+      //  $('.modal-News').load('/opt/tovar/getOneNew');
 
     }
     $(document).on('click', '#News', function() {
@@ -871,20 +856,14 @@ if (!is_null($loginData['logged_in'])) {
                     $('.col_insert').remove();
                     //$('#ajax_result').html('<div class="alert alert-danger">' + data.message + '</div>');
                 }
+
             },
             error: function () {
                 $('#ajax_result').html('<div class="alert alert-danger">Ошибка выполнения запроса!</div>');
             }
         });
     }
-    function ShowNew(guid2) {
-        console.log('/opt/tovar/ajax_search_nov/' + guid2);
-        $.getJSON('/opt/tovar/ajax_search_nov/' + guid2,
-                 function (data) {
-                    $('#news_table').html(data.html);
-                 }
-        );
-    }
+
 </script>
 <script src="/ci/bootstrap/js/bootstrap.min.js"></script>
 </body>

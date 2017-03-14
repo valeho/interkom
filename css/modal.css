@@ -97,5 +97,128 @@
 }
 
 .news_title {
-    width:200px;
+    width:600px;
+    padding-left:16px;
+}
+.content_news {
+
+}
+.news_header {
+    font-family: "GothamProMedium";
+    font-size:25px;
+    padding-left:20px;
+    padding-top:10px;
+}
+
+.cursor {
+    color:#0074bc;
+
+    font-size:22px;
+    margin-top:10px;
+    position: relative;
+    top:3px;
+}
+.close_btn{
+    padding-right:25px;
+    margin-right:-5px;
+    margin-top:-5px;
+    color:#f71313;
+    font-size:40px;
+    font-weight: 500;
+    opacity: 1;
+}
+
+.close_btn:hover {
+    color:#f71313;
+}
+.news_image {
+float:left;
+    width:112px;
+}
+
+.news_left {
+    font-family:"GothamProRegular";
+    font-size:16px;
+    padding-left:18px;
+}
+
+.colls_news {
+    border:0px;
+}
+.colls_news th {
+    background:#0074bc;
+    color:#fff;
+    text-align: left;
+    padding-left:40px;
+    border:0px;
+}
+
+.colls_news td {
+    text-align: left;
+}
+.content_news p {
+    font-family:"GothamProRegular";
+    font-size:14px;
+}
+
+.content_news .content_header {
+    font-family: "GothamProMedium";
+    font-size:16px;
+    margin-bottom: 5px;
+}
+
+.news-body {
+    padding-left:35px;
+    padding-right:35px;
+}
+.button, .btn_news_all {
+    background:#cd302b;
+    color:#fff;
+    width:141px;
+    padding:10px;
+    padding-left:20px;
+    padding-right:20px;
+    border:solid 0px;
+    margin-top:10px;
+    position: relative;
+    border-radius: 3px;
+}
+
+.btn_news_all:hover {
+    color:#fff;
+}
+a.button:hover {
+    color:#fff;
+}
+.btn_news {
+    color:#000;
+    margin-left:-20px;
+}
+.btn_news .count {
+    background:url('/opt/img/round.jpg');
+    width:19px;
+    height:19px;
+    display: block;
+    float: right;
+    text-align: center;
+    margin-top:-5px;
+    padding-top: 3px;
+
+}
+sup {
+    padding-left:-1px;
+}
+
+.button_wrapper {
+    text-align: center;
+    width:700px;
+    margin-top:10px;
+    margin-bottom: 20px;
+}
+#NewsMenu hr {
+    border:solid 1px #eee;
+    width:90%;
+}
+#News > div > div > div > table.colls.table.table-striped.colls_news > tbody > tr.col_insert_new > th {
+    vertical-align: middle;
 }

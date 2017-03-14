@@ -58,6 +58,7 @@
 </body>
 </html>
 <!-- Modal -->
+<?php $this->load->view('template/bottom_news'); ?>
 <div class="modal fade" id="autorizModal" tabindex="-1" role="dialog" aria-labelledby="autorizModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

@@ -31,12 +31,22 @@ class Magazine extends CI_Controller
         }
     }
 
+    public function getCountNews() {
+        $master = $this->load->database('master', TRUE, TRUE);
+        $sql = <<<EOL
+                exec dbo.NewsCount $this->_skidCode
+EOL;
+        $result = $master->query($sql);
+        $res = $result->result();
+        //print_r($res);
+        return $res[0]->CountView;
+    }
+
     public function index()
     {
         $skidki = $this->session->userdata('dataLogin');
         $data['loginData'] = $skidki;
         $guid = $this->_skidCode;
-		echo $guid;
         $sql = <<<EOL
                 exec dbo.sp_tab_jrn $guid
 EOL;
@@ -44,7 +54,7 @@ EOL;
         
         $data['content'] = $result->result();
         $data['guid'] = str_replace("'", "", $guid);
-
+        $data['count'] = $this->getCountNews();
         $this->load->view('magazine/index', $data);
     }
 
