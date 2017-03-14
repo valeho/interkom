@@ -23,7 +23,7 @@ if (!empty($arr)) {
                 <div class="content_news col-sm-9">
                     <div class="content_header"><?php echo $item['title']; ?></div>
                     <p><?php echo $item['news']; ?></p>
-                    <div style="margin-bottom:20px; top:10px; position: relative">
+                    <div style="margin-bottom:20px; top:10px; posi">
                 <a href="#" guid="<?php echo $item['guid'];?>" class="button">
                     Читать полностью</a>
                     </div>
